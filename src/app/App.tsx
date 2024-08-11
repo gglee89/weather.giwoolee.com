@@ -4,20 +4,24 @@ import "./App.css";
 import {
   RemoteSearchResultItem,
   SearchResultItemType,
-} from "./models/SearchResultItemType";
-import SearchResultItem from "./views/SearchResultItem";
+} from "@/models/SearchResultItemType";
+import SearchResultItem from "@/components/SearchResultItem";
+import { RemoteCityWeather } from "@/models/RemoteCityWeather";
+import { CityWeather } from "@/models/CityWeather";
 
 export const APP_ID = "2c1fac36cbadaea095718a649c206d49";
 
 const App = () => {
-  const [city, setCity] = useState<any>();
+  const [city, setCity] = useState<CityWeather>();
   const [query, setQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<SearchResultItemType[]>(
     []
   );
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
+      setIsDropdownOpen(true);
       fetchCities();
     }
   };
@@ -32,6 +36,7 @@ const App = () => {
       .then((r) => r.json())
       .then((cities: RemoteSearchResultItem[]) => {
         setSearchResults(cities.map((city) => new SearchResultItemType(city)));
+        setIsDropdownOpen(true);
       });
   };
 
@@ -40,16 +45,12 @@ const App = () => {
       `https://api.openweathermap.org/data/2.5/weather?lat=${item.latitude}&lon=${item.longitude}&appid=${APP_ID}&units=metric`
     )
       .then((r) => r.json())
-      .then((cityWeather) => {
+      .then((cityWeather: RemoteCityWeather) => {
         console.log("cityWeather", cityWeather);
-        setCity({
-          name: cityWeather.name,
-          degree: cityWeather.main.temp,
-        });
+        setCity(new CityWeather(cityWeather));
+        setIsDropdownOpen(false);
       });
   };
-
-  console.log("city", city);
 
   return (
     <main className="app">
@@ -63,24 +64,26 @@ const App = () => {
           placeholder="Enter city name (e.g. Melbourne, New York)"
         />
       </div>
-      <div className="search-results-popup">
-        {searchResults.length > 0 && (
-          <ul data-testid="search-results">
-            {searchResults.map((city, index) => (
-              <SearchResultItem
-                key={index}
-                item={city}
-                onItemClick={onItemClick}
-              />
-            ))}
-          </ul>
-        )}
-      </div>
+      {isDropdownOpen && (
+        <div className="search-results-popup">
+          {searchResults.length > 0 && (
+            <ul data-testid="search-results">
+              {searchResults.map((city, index) => (
+                <SearchResultItem
+                  key={index}
+                  item={city}
+                  onItemClick={onItemClick}
+                />
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
       <div data-testid="favorite-cities">
         {city && (
           <div className="city">
-            <span>{city.name}</span>
-            <span>{city.degree}°C</span>
+            <span className="text-gray-600">{city.name}</span>
+            <span className="text-gray-600">{city.degree}°C</span>
           </div>
         )}
       </div>

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { SearchResultItemType } from "../models/SearchResultItemType";
+import { SearchResultItemType } from "@/models/SearchResultItemType";
 
 const SearchResultItem = ({
   item,

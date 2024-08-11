@@ -43,7 +43,7 @@ it("converts the remote type to local", () => {
   };
 
   const model = new SearchResultItemType(remote);
-  expect(model.city).toBe(remote.name);
-  expect(model.state).toBe(remote.state);
-  expect(model.country).toBe(model.country);
+  expect(model.city).toEqual(remote.name);
+  expect(model.state).toEqual(remote.state);
+  expect(model.country).toEqual(model.country);
 });
