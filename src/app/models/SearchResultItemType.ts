@@ -36,7 +36,9 @@ export class SearchResultItemType {
     return this._state;
   }
   get country() {
-    return countryMap[this._country] || this._country;
+    return (
+      countryMap[this._country as keyof typeof countryMap] || this._country
+    );
   }
   get latitude() {
     return this._lat;
